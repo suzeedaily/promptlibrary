@@ -1,613 +1,1043 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prompt Library — Rebuild Systematically</title>
-  <meta name="description" content="The Claude prompts I use to rebuild my life, one system at a time." />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rebuild Your Life with AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
 
-    :root {
-      --bg: #0d0d0d;
-      --surface: #161616;
-      --surface-hover: #1e1e1e;
-      --border: #2a2a2a;
-      --border-active: #3f3f3f;
-      --text-primary: #f0f0f0;
-      --text-secondary: #888;
-      --text-muted: #555;
-      --accent: #e8e8e8;
-      --accent-dim: #c0c0c0;
-      --tag-bg: #1f1f1f;
-      --copy-success: #4ade80;
-      --radius: 10px;
-      --font: 'Inter', system-ui, -apple-system, sans-serif;
-    }
+<style>
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
 
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+/* ── Tokens ── */
+:root {
+  --paper:      #F5F4F0;
+  --paper2:     #EDECEA;
+  --paper3:     #E2E0DC;
+  --rule:       #D4D1CB;
+  --rule2:      #C0BDB6;
+  --ink:        #1A1917;
+  --ink2:       #4A4844;
+  --ink3:       #8A8784;
+  --ink4:       #B0ADA9;
 
-    body {
-      background: var(--bg);
-      color: var(--text-primary);
-      font-family: var(--font);
-      font-size: 15px;
-      line-height: 1.6;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
+  --amber:      #D97706;
+  --amber-pale: #FEF3C7;
+  --amber-ring: rgba(217,119,6,0.2);
 
-    /* ── Header ── */
-    header {
-      border-bottom: 1px solid var(--border);
-      padding: 32px 24px 28px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
+  /* Lab colors per category */
+  --mind:       #6366F1; --mind-pale:    #EEF2FF;
+  --clarity:    #0891B2; --clarity-pale: #E0F7FA;
+  --output:     #16A34A; --output-pale:  #F0FDF4;
+  --systems:    #DC2626; --systems-pale: #FEF2F2;
+  --growth:     #9333EA; --growth-pale:  #FAF5FF;
+  --connect:    #D97706; --connect-pale: #FFFBEB;
 
-    .header-inner {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
+  --radius-sm: 6px;
+  --radius:    10px;
+  --radius-lg: 16px;
+  --shadow-xs: 0 1px 2px rgba(26,25,23,0.06);
+  --shadow-sm: 0 2px 8px rgba(26,25,23,0.08);
+  --shadow-md: 0 6px 24px rgba(26,25,23,0.10);
+  --shadow-lg: 0 24px 56px rgba(26,25,23,0.14);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --t: 200ms;
+}
 
-    .site-name {
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-    }
+/* ── Base ── */
+body {
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
 
-    h1 {
-      font-size: clamp(26px, 5vw, 40px);
-      font-weight: 600;
-      letter-spacing: -0.03em;
-      color: var(--text-primary);
-      line-height: 1.15;
-      margin-top: 10px;
-    }
+/* ── Grid paper background ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--rule) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+  background-size: 32px 32px;
+  opacity: 0.35;
+}
 
-    .tagline {
-      color: var(--text-secondary);
-      font-size: 15px;
-      font-weight: 400;
-      margin-top: 8px;
-      max-width: 480px;
-    }
+/* ── Everything above the grid ── */
+.page { position: relative; z-index: 1; }
 
-    .header-count {
-      font-size: 13px;
-      color: var(--text-muted);
-      white-space: nowrap;
-      padding-bottom: 4px;
-    }
+/* ════════════════════════════════
+   HEADER / NAV
+════════════════════════════════ */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(245,244,240,0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rule);
+  padding: 0 32px;
+  height: 56px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
 
-    /* ── Filter bar ── */
-    .filter-bar {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 24px 24px 0;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none;
+}
 
-    .filter-label {
-      font-size: 12px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-right: 4px;
-    }
+.logo-mark {
+  width: 28px; height: 28px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
 
-    .filter-btn {
-      background: var(--tag-bg);
-      border: 1px solid var(--border);
-      color: var(--text-secondary);
-      font-family: var(--font);
-      font-size: 13px;
-      padding: 6px 14px;
-      border-radius: 99px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      white-space: nowrap;
-    }
+.logo-mark::after {
+  content: '';
+  width: 8px; height: 8px;
+  background: var(--amber);
+  border-radius: 50%;
+}
 
-    .filter-btn:hover {
-      border-color: var(--border-active);
-      color: var(--text-primary);
-    }
+.logo-text {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px; font-weight: 600;
+  color: var(--ink); letter-spacing: -0.01em;
+}
 
-    .filter-btn.active {
-      background: var(--text-primary);
-      color: var(--bg);
-      border-color: var(--text-primary);
-      font-weight: 500;
-    }
+.logo-text span { color: var(--ink3); font-weight: 400; }
 
-    /* ── Grid ── */
-    main {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 28px 24px 80px;
-    }
+.nav-search-wrap {
+  flex: 1; max-width: 400px;
+  position: relative; display: flex; align-items: center;
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 16px;
-    }
+.nav-search-wrap svg {
+  position: absolute; left: 12px;
+  color: var(--ink3); pointer-events: none;
+}
 
-    /* ── Card ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      transition: border-color 0.15s ease, background 0.15s ease;
-      position: relative;
-    }
+#search {
+  width: 100%;
+  padding: 8px 36px 8px 36px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px; color: var(--ink);
+  background: var(--paper2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--t), box-shadow var(--t);
+}
 
-    .card:hover {
-      background: var(--surface-hover);
-      border-color: var(--border-active);
-    }
+#search::placeholder { color: var(--ink4); font-style: italic; }
 
-    .card.hidden { display: none; }
+#search:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-ring);
+  background: #fff;
+}
 
-    .card-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
+#search-clear {
+  position: absolute; right: 8px;
+  background: none; border: none; cursor: pointer;
+  color: var(--ink3); padding: 4px; display: none;
+  align-items: center; justify-content: center;
+}
+#search-clear.show { display: flex; }
+#search-clear:hover { color: var(--ink); }
 
-    .card-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-primary);
-      line-height: 1.3;
-    }
+/* ════════════════════════════════
+   HERO
+════════════════════════════════ */
+.hero {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 72px 32px 56px;
+}
 
-    .card-tag {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      background: var(--tag-bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 3px 8px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
+.hero-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 20px;
+}
 
-    .card-desc {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
+.hero h1 {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: clamp(36px, 6vw, 60px);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
 
-    .prompt-block {
-      background: #111;
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 14px 16px;
-      font-size: 13px;
-      color: var(--accent-dim);
-      line-height: 1.7;
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
-      max-height: 160px;
-      overflow: hidden;
-      position: relative;
-      cursor: pointer;
-    }
+.hero h1 strong {
+  font-weight: 600;
+  border-bottom: 2px solid var(--amber);
+  padding-bottom: 2px;
+}
 
-    .prompt-block.expanded {
-      max-height: none;
-    }
+.hero-sub {
+  font-size: 16px; font-weight: 300;
+  color: var(--ink2); max-width: 520px;
+  line-height: 1.65; margin-bottom: 0;
+}
 
-    .prompt-fade {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 60px;
-      background: linear-gradient(transparent, #111);
-      pointer-events: none;
-    }
+.hero-meta {
+  margin-top: 32px;
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+}
 
-    .prompt-block.expanded .prompt-fade { display: none; }
+.hero-stat {
+  display: flex; align-items: baseline; gap: 6px;
+}
 
-    .card-actions {
-      display: flex;
-      gap: 8px;
-    }
+.hero-stat-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 22px; font-weight: 600; color: var(--ink);
+}
 
-    .btn {
-      font-family: var(--font);
-      font-size: 12px;
-      font-weight: 500;
-      padding: 7px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      transition: all 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      letter-spacing: 0.01em;
-    }
+.hero-stat-label {
+  font-size: 12px; color: var(--ink3);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
 
-    .btn-copy {
-      background: transparent;
-      color: var(--text-secondary);
-    }
+.hero-divider {
+  width: 1px; height: 28px; background: var(--rule);
+}
 
-    .btn-copy:hover {
-      background: var(--surface-hover);
-      border-color: var(--border-active);
-      color: var(--text-primary);
-    }
+/* ════════════════════════════════
+   MAIN
+════════════════════════════════ */
+.main-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 32px 80px;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 40px;
+  align-items: start;
+}
 
-    .btn-copy.copied {
-      color: var(--copy-success);
-      border-color: var(--copy-success);
-    }
+/* ════════════════════════════════
+   SIDEBAR
+════════════════════════════════ */
+.sidebar {
+  position: sticky; top: 72px;
+}
 
-    .btn-expand {
-      background: transparent;
-      color: var(--text-muted);
-      border-color: transparent;
-      padding-left: 0;
-    }
+.sidebar-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink4); margin-bottom: 10px;
+}
 
-    .btn-expand:hover {
-      color: var(--text-secondary);
-      background: transparent;
-      border-color: transparent;
-    }
+.cat-list { display: flex; flex-direction: column; gap: 2px; }
 
-    /* ── Empty state ── */
-    .empty {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 64px 24px;
-      color: var(--text-muted);
-      font-size: 14px;
-    }
+.cat-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; padding: 8px 10px;
+  background: none; border: none; cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 500;
+  color: var(--ink2); text-align: left; border-radius: var(--radius-sm);
+  transition: all var(--t);
+}
 
-    /* ── Footer ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 24px;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 13px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
+.cat-btn:hover { background: var(--paper2); color: var(--ink); }
 
-    footer a {
-      color: var(--text-secondary);
-      text-decoration: none;
-    }
+.cat-btn.active {
+  background: var(--ink);
+  color: var(--paper);
+}
 
-    footer a:hover { color: var(--text-primary); }
+.cat-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; color: var(--ink3);
+  background: var(--paper2); border-radius: 4px;
+  padding: 1px 6px;
+}
 
-    /* ── Responsive ── */
-    @media (max-width: 600px) {
-      header, .filter-bar, main { padding-left: 16px; padding-right: 16px; }
-      .grid { grid-template-columns: 1fr; }
-    }
-  </style>
+.cat-btn.active .cat-count { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+
+.sidebar-rule {
+  border: none; border-top: 1px solid var(--rule);
+  margin: 16px 0;
+}
+
+/* ════════════════════════════════
+   CONTENT
+════════════════════════════════ */
+.content-head {
+  display: flex; align-items: baseline;
+  justify-content: space-between; gap: 12px;
+  margin-bottom: 20px; flex-wrap: wrap;
+}
+
+.content-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px; font-weight: 500; color: var(--ink);
+}
+
+.content-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px; color: var(--ink3);
+}
+
+/* ════════════════════════════════
+   PROTOCOL CARDS
+════════════════════════════════ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  display: flex; flex-direction: column; gap: 14px;
+  transition: transform var(--t) var(--ease), box-shadow var(--t) var(--ease), border-color var(--t);
+  box-shadow: var(--shadow-xs);
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--rule2);
+}
+
+.card.hidden { display: none; }
+
+.card-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+
+.card-cat {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 4px;
+}
+
+.card-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; color: var(--ink4);
+}
+
+.card-title {
+  font-size: 15px; font-weight: 600;
+  color: var(--ink); line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.card-desc {
+  font-size: 13px; font-weight: 300;
+  color: var(--ink2); line-height: 1.6;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.card-preview {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; color: var(--ink3);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 8px 10px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-style: italic;
+}
+
+.card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 4px;
+}
+
+.card-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+
+.tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; color: var(--ink3);
+  background: var(--paper2); border: 1px solid var(--rule);
+  padding: 2px 7px; border-radius: 3px;
+}
+
+.btn-copy-card {
+  background: none; border: 1px solid var(--rule);
+  border-radius: var(--radius-sm); padding: 5px 10px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;
+  color: var(--ink2); cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  transition: all var(--t); flex-shrink: 0;
+}
+
+.btn-copy-card:hover { border-color: var(--rule2); color: var(--ink); background: var(--paper2); }
+
+.btn-copy-card.copied {
+  border-color: var(--output); color: var(--output); background: var(--output-pale);
+  animation: pop 180ms var(--ease);
+}
+
+@keyframes pop { 50% { transform: scale(1.08); } }
+
+/* ── Category color mapping ── */
+.card[data-cat="Mind"]    .card-cat { background: var(--mind-pale);    color: var(--mind); }
+.card[data-cat="Clarity"] .card-cat { background: var(--clarity-pale); color: var(--clarity); }
+.card[data-cat="Output"]  .card-cat { background: var(--output-pale);  color: var(--output); }
+.card[data-cat="Systems"] .card-cat { background: var(--systems-pale); color: var(--systems); }
+.card[data-cat="Growth"]  .card-cat { background: var(--growth-pale);  color: var(--growth); }
+.card[data-cat="Connect"] .card-cat { background: var(--connect-pale); color: var(--connect); }
+
+/* ── Empty state ── */
+.empty {
+  grid-column: 1/-1; text-align: center; padding: 64px 24px;
+}
+
+.empty-code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; color: var(--ink4);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.empty h3 {
+  font-size: 18px; font-weight: 500; color: var(--ink2);
+  margin-bottom: 8px;
+}
+
+.empty p { font-size: 13px; color: var(--ink3); }
+
+/* ════════════════════════════════
+   MODAL
+════════════════════════════════ */
+.overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(26,25,23,0.55);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 0;
+  opacity: 0; pointer-events: none;
+  transition: opacity 240ms var(--ease);
+}
+
+@media (min-width: 600px) {
+  .overlay { align-items: center; padding: 24px; }
+}
+
+.overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--paper);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border: 1px solid var(--rule);
+  width: 100%; max-width: 660px;
+  max-height: 90vh;
+  display: flex; flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(20px);
+  transition: transform 260ms var(--ease);
+  overflow: hidden;
+}
+
+@media (min-width: 600px) {
+  .modal { border-radius: var(--radius-lg); }
+}
+
+.overlay.open .modal { transform: translateY(0); }
+
+.modal-head {
+  padding: 24px 24px 0;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  flex-shrink: 0;
+}
+
+.modal-meta { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+.modal-id {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; color: var(--ink3);
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+
+.modal-cat {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  display: inline-flex; align-self: flex-start;
+  padding: 3px 9px; border-radius: 4px;
+}
+
+.modal-title {
+  font-size: 20px; font-weight: 600; letter-spacing: -0.02em;
+  line-height: 1.2; color: var(--ink);
+}
+
+.modal-desc {
+  font-size: 14px; font-weight: 300;
+  color: var(--ink2); line-height: 1.65;
+}
+
+.btn-close {
+  width: 30px; height: 30px; flex-shrink: 0;
+  background: var(--paper2); border: 1px solid var(--rule);
+  border-radius: 50%; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink2); transition: all var(--t);
+}
+.btn-close:hover { background: var(--paper3); color: var(--ink); }
+
+.modal-body {
+  padding: 20px 24px;
+  overflow-y: auto; flex: 1;
+}
+
+.modal-protocol-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink4); margin-bottom: 8px;
+}
+
+.modal-prompt {
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 18px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px; line-height: 1.85;
+  color: var(--ink); white-space: pre-wrap; word-break: break-word;
+}
+
+.modal-example {
+  margin-top: 14px;
+  padding: 13px 16px;
+  background: var(--amber-pale);
+  border: 1px solid rgba(217,119,6,0.2);
+  border-radius: var(--radius-sm);
+}
+
+.modal-example-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--amber); margin-bottom: 5px;
+}
+
+.modal-example-text { font-size: 13px; color: var(--ink2); line-height: 1.6; }
+
+.modal-foot {
+  padding: 14px 24px 20px;
+  border-top: 1px solid var(--rule);
+  flex-shrink: 0;
+}
+
+.btn-run {
+  width: 100%; padding: 12px;
+  background: var(--ink); color: var(--paper);
+  border: none; border-radius: var(--radius-sm);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  letter-spacing: 0.04em;
+  transition: all var(--t);
+}
+
+.btn-run:hover { background: var(--ink2); }
+.btn-run.copied { background: var(--output); animation: pop 180ms var(--ease); }
+
+/* ════════════════════════════════
+   FOOTER
+════════════════════════════════ */
+footer {
+  border-top: 1px solid var(--rule);
+  padding: 24px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; color: var(--ink4);
+  position: relative; z-index: 1;
+}
+
+/* ════════════════════════════════
+   RESPONSIVE
+════════════════════════════════ */
+@media (max-width: 760px) {
+  .main-wrap { grid-template-columns: 1fr; gap: 24px; padding: 0 16px 64px; }
+  .sidebar { position: static; }
+  .cat-list { flex-direction: row; flex-wrap: wrap; gap: 6px; }
+  .cat-btn { width: auto; padding: 6px 12px; }
+  .hero { padding: 48px 16px 40px; }
+  nav { padding: 0 16px; }
+  .logo-text span { display: none; }
+  footer { padding: 20px 16px; }
+}
+</style>
 </head>
 <body>
+<div class="page">
 
-<header>
-  <div class="header-inner">
-    <div>
-      <p class="site-name">Your Handle · Claude Prompts</p>
-      <h1>Prompts That Rebuilt My Life</h1>
-      <p class="tagline">Every system I've built starts with a good question. Here's exactly what I ask Claude.</p>
-    </div>
-    <p class="header-count" id="count"></p>
+<!-- ══ NAV ══════════════════════════════════════════════════ -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="logo-mark"></div>
+    <span class="logo-text">life.lab <span>/ prompts</span></span>
+  </a>
+
+  <div class="nav-search-wrap">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input id="search" type="search" placeholder="search protocols..." autocomplete="off" />
+    <button id="search-clear" aria-label="Clear">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
   </div>
-</header>
+</nav>
 
-<div class="filter-bar">
-  <span class="filter-label">Filter</span>
-  <button class="filter-btn active" data-cat="all">All</button>
+<!-- ══ HERO ═════════════════════════════════════════════════ -->
+<div class="hero">
+  <p class="hero-label">Protocol Library — v1.0</p>
+  <h1>Rebuild Your Life<br><strong>with AI</strong></h1>
+  <p class="hero-sub">Every prompt is a protocol — a repeatable experiment for thinking clearer, working smarter, and building a life by design. Run one. See what happens.</p>
+  <div class="hero-meta">
+    <div class="hero-stat">
+      <span class="hero-stat-num" id="total-count">0</span>
+      <span class="hero-stat-label">Protocols</span>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat">
+      <span class="hero-stat-num" id="cat-count">0</span>
+      <span class="hero-stat-label">Categories</span>
+    </div>
+  </div>
 </div>
 
-<main>
-  <div class="grid" id="grid"></div>
-</main>
+<!-- ══ MAIN ══════════════════════════════════════════════════ -->
+<div class="main-wrap">
 
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <p class="sidebar-label">Experiment type</p>
+    <div class="cat-list" id="cat-list"></div>
+  </aside>
+
+  <!-- Content -->
+  <div>
+    <div class="content-head">
+      <span class="content-title" id="content-title">— All protocols</span>
+      <span class="content-count" id="content-count"></span>
+    </div>
+    <div class="grid" id="grid" role="list"></div>
+  </div>
+
+</div>
+
+<!-- ══ FOOTER ════════════════════════════════════════════════ -->
 <footer>
-  <p>Built by <a href="#" target="_blank">Your Handle</a> · Follow for more systems ↗</p>
+  <span>Rebuild Your Life with AI</span>
+  <span>Built with Claude</span>
 </footer>
 
+</div><!-- /page -->
+
+<!-- ══ MODAL ════════════════════════════════════════════════ -->
+<div class="overlay" id="overlay" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-meta">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="modal-cat" id="m-cat"></span>
+          <span class="modal-id" id="m-id"></span>
+        </div>
+        <h2 class="modal-title" id="m-title"></h2>
+        <p class="modal-desc" id="m-desc"></p>
+      </div>
+      <button class="btn-close" id="btn-close" aria-label="Close">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="m-example" style="display:none; margin-bottom:14px;">
+        <div class="modal-example">
+          <p class="modal-example-label">When to run this</p>
+          <p class="modal-example-text" id="m-example-text"></p>
+        </div>
+      </div>
+      <p class="modal-protocol-label">Protocol</p>
+      <pre class="modal-prompt" id="m-prompt"></pre>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-run" id="m-copy">Copy Protocol</button>
+      <a id="m-instagram" href="#" target="_blank" rel="noopener noreferrer" style="display:none;margin-top:10px;width:100%;padding:10px;border:1.5px solid var(--rule);border-radius:var(--radius-sm);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;color:var(--ink2);text-align:center;text-decoration:none;transition:all 200ms;cursor:pointer;">
+        See how I use this on Instagram
+      </a>
+    </div>
+  </div>
+</div>
+
 <script>
-  // ─────────────────────────────────────────
-  // EDIT YOUR PROMPTS HERE
-  // ─────────────────────────────────────────
-  const prompts = [
-    {
-      title: "Weekly Life Audit",
-      category: "Reflection",
-      description: "A structured review of the past week — what worked, what drained me, and what to adjust.",
-      prompt: `I want to do a weekly audit of my life. Ask me questions one at a time about:
-1. What I accomplished this week
-2. Where I lost time or energy
-3. What drained me vs. energized me
-4. One thing I'd change next week
+/* ============================================================
+   PROMPTS DATA
+   Edit this array to add or change protocols.
+   Fields: id, title, category, tags, description, promptText, exampleUse (optional), instagramUrl (optional)
+   Categories: Mind | Output
+   ============================================================ */
+const PROMPTS = [
+  {
+    id: "EXP-001",
+    title: "Reading Reflection Panel",
+    category: "Mind",
+    tags: ["reading", "books", "retention", "learning"],
+    description: "Internalize any book through 4 guided agents — Skeptic, Connector, Operator, Synthesizer. Push past nodding along.",
+    promptText: `You are my Reading Reflection Panel. I just finished a book and your job is to help me actually internalize it — not summarize it. I retain nothing when I just nod along, so push me.
 
-After each answer, reflect it back to me and ask the next question. At the end, summarize patterns you notice and give me 3 specific actions for next week.`
-    },
-    {
-      title: "Build a Morning Routine",
-      category: "Habits",
-      description: "Design a realistic morning routine based on your goals and constraints.",
-      prompt: `Help me design a morning routine that actually sticks. Ask me:
-- What time I need to start work or leave the house
-- My current wake-up time
-- My top 3 life priorities right now
-- What I've tried before that failed and why
+Run me through 4 "agents," ONE AT A TIME. Ask that agent's questions, WAIT for my answers, push back if my answer is lazy or vague, then move to the next agent only when I say to continue. At the end, compress everything.
 
-Then build me a 30-minute minimum routine with a version that expands to 60 minutes on good days. Make it specific, not generic.`
-    },
-    {
-      title: "Identify a Self-Sabotage Pattern",
-      category: "Mindset",
-      description: "Surface the recurring pattern that keeps showing up in different areas of your life.",
-      prompt: `I want to identify a self-sabotage pattern I keep repeating. I'll describe a situation where I got in my own way. Ask me clarifying questions to understand:
-- What I was trying to achieve
-- What I did instead
-- How I felt before, during, and after
-- Where else this pattern shows up
+THE 4 AGENTS:
 
-Then reflect back the pattern you see without judgment, name it, and help me understand what need it's trying to meet. Don't jump to solutions — just help me see clearly first.`
-    },
-    {
-      title: "Reverse-Engineer a Goal",
-      category: "Planning",
-      description: "Start from the end result and work backwards to today's first action.",
-      prompt: `I want to reverse-engineer a goal I have. The goal is: [INSERT YOUR GOAL]
+1. THE SKEPTIC — stop me nodding along.
+   - What's the single strongest claim in this book? One sentence, no hedging.
+   - What would have to be true for it to be WRONG? A real case where it failed?
+   - Where is the author generalizing from a thin or biased sample?
+   - Which ideas did I already believe, vs. which actually changed my mind?
+   - If a smart friend disagreed with the core message, what's their best argument?
+   (If I'm stuck, draft the strongest counter-case for me.)
 
-Work backwards with me:
-1. What does success look like in concrete, measurable terms?
-2. What needs to be true 3 months before that?
-3. What needs to be true 1 month before that?
-4. What needs to be true 1 week from now?
-5. What's the one action I can take today?
+2. THE CONNECTOR — stop ideas from floating away.
+   - What other book/idea/framework does this connect to — agree, extend, or contradict?
+   - Where have I seen this play out in my own past?
+   - Explain the core idea with an analogy using only things a beginner already knows.
+   - Does any idea here CONFLICT with something I already believe? (Dig into conflicts.)
 
-For each step, flag any assumptions or risks I might be overlooking.`
-    },
-    {
-      title: "Declutter a Decision",
-      category: "Clarity",
-      description: "Cut through overthinking and get to what you actually want.",
-      prompt: `I'm stuck on a decision and need help thinking it through. The decision is: [INSERT DECISION]
+3. THE OPERATOR — turn insight into action (most important).
+   - What's the ONE thing I'll do differently? (One. Five means zero.)
+   - What should I STOP doing?
+   - Smallest first step in the next 48 hours?
+   - How will I know in 90 days it worked — what's the visible signal?
+   (Help me make it specific and pre-committed so emotion can't move the goalpost.)
 
-Don't tell me what to do. Instead:
-1. Ask me what each option would give me
-2. Ask me what each option would cost me (time, money, energy, relationships)
-3. Ask me which option I'd be embarrassed to explain to someone I respect
-4. Ask me which option I'd choose if I knew I couldn't fail
+4. THE SYNTHESIZER — make it portable.
+   - In 3 sentences or fewer, what is this book actually about?
+   - The ONE idea I want to still be living by in a year?
+   - What did the book get wrong or leave out?
+   - The single sentence I'd want to reread — my keepsake.
 
-Then reflect back what my answers reveal about my actual values and what I seem to already know but haven't admitted yet.`
-    },
-    {
-      title: "Financial Snapshot",
-      category: "Finance",
-      description: "Get a clear picture of where your money actually is and where it's going.",
-      prompt: `Help me get a clear financial snapshot. I'll share my numbers with you — income, fixed expenses, variable spending, savings, and debts.
+RULES:
+- One agent at a time. Don't dump all questions at once.
+- Be warm but don't let me off easy — recognition isn't understanding.
+- After each agent, write a one-line "sharper takeaway" capturing what I actually concluded.
+- At the very end, give me: the 3-sentence summary, my keep-for-a-year idea, and my one action.
 
-After I share them:
-1. Calculate my actual savings rate
-2. Identify my top 3 spending leaks
-3. Show me what happens if I redirect $[X] per month to savings/debt for 12 months
-4. Give me 2 specific changes I could make this week that would have the most impact
+Start by asking which book I just finished, then begin with the Skeptic.`,
+    exampleUse: "Run this immediately after finishing any non-fiction book before the ideas fade.",
+    instagramUrl: "https://www.instagram.com/p/DZ9VauTiaT4/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
+  },
+  {
+    id: "EXP-002",
+    title: "Personal Meal Planning App",
+    category: "Output",
+    tags: ["meal planning", "productivity", "app", "HTML tool"],
+    description: "Build a fully functional personal meal planner as one self-contained HTML file — no server, no login, everything saved in your browser.",
+    promptText: `Build me a personal meal-planning app as ONE self-contained HTML file that saves all data in the browser's localStorage (so it persists per device). It must work in any browser with no login, no server, and no external services. Start with an EMPTY recipe database — I'll add my own recipes.
 
-Be direct. Don't soften the numbers.`
-    },
-    {
-      title: "Energy Audit",
-      category: "Habits",
-      description: "Map which activities give you energy and which drain it — then optimize your week around that.",
-      prompt: `I want to audit my energy, not just my time. For the next few minutes, I'll list everything I do in a typical week. For each thing I mention, ask me to rate it: does it give me energy (+), drain me (-), or feel neutral (0)?
+LOOK: clean "modern foodie" style — white content area, a dark banner across the top with a bold white title, one fresh-green primary colour and a coral accent, modern sans-serif, rounded cards, no emoji. In the dark banner, the title is an editable text field: the user types their name and it reads "<Name> Meal Planner" (saved in localStorage, also used as the page title). Colour-code the meal slots everywhere: Breakfast = orange, Lunch = green, Dinner = blue.
 
-After I've listed everything, help me:
-1. See the pattern — what type of activities charge vs. drain me
-2. Identify what I'm spending the most energy on that's draining
-3. Find where I could add more of what energizes me
-4. Design one small experiment for next week based on this`
-    },
-    {
-      title: "Write My Personal Values",
-      category: "Mindset",
-      description: "Discover your actual values by looking at behavior, not aspiration.",
-      prompt: `Help me discover my real values — not the ones I think I should have, but the ones that actually show up in my choices.
+FOUR tabs:
 
-Ask me these questions one at a time:
-1. Tell me about a decision you made in the last year that you're proud of.
-2. Tell me about a time you compromised on something and regretted it.
-3. What do you judge other people for? (This often reveals your values.)
-4. When have you felt most like yourself?
+1) TODAY MENU (default) — what to cook today. For each meal scheduled for today, a card showing: slot badge, name, category, estimated calories/protein; a "Start cooking" time vs "Ready to serve" time (from editable breakfast/lunch/dinner meal times minus the recipe's prep+cook minutes); a tickable ingredient list; the numbered steps; the note; and a "Mark cooked" button that turns green and shows "Cooked today" (tap to undo). Marking cooked is the ONLY thing that updates the cooking history.
 
-After each answer, note the value or principle that seems to be driving it. At the end, give me a short list of 5 values that seem to genuinely describe me, with one sentence explaining the evidence for each.`
-    },
-    {
-      title: "Plan a Hard Conversation",
-      category: "Relationships",
-      description: "Prepare for a difficult conversation without overthinking or avoiding it.",
-      prompt: `I need to have a hard conversation with someone and I want to prepare properly. The situation is: [DESCRIBE THE SITUATION]
+2) WEEKLY PLAN — a vertical agenda, one full-width row per day (Mon–Sun) with the date and the meals scheduled that day as colour-coded chips. Clicking a meal opens its ingredients + method in an inline box right under that day, which toggles closed on a second click. Buttons to move between weeks.
 
-Help me:
-1. Clarify what outcome I actually want from this conversation
-2. Identify the one core thing I need to communicate
-3. Anticipate how the other person might react and why
-4. Draft an opening statement that is honest but not attacking
-5. Plan what I'll do if the conversation goes sideways
+3) SHOPPING LIST — auto-built from the meals scheduled in the selected week. Combine quantities with units (300g + 200g chicken = "500 g"; counted items like prawns show "pcs") — every line shows a number + a unit. Exclude my editable "Pantry" staples. Group items bento-style into colour-coded categories (Meat & Poultry, Seafood, Vegetables, Fruits, Aromatics & Spices, Tofu & Soy, Eggs & Dairy, Condiments & Sauces, Pantry & Dry, Other). No tick boxes. A "Copy" button.
 
-Keep it practical. I want to actually have this conversation, not avoid it.`
-    },
-    {
-      title: "Rebuild a Broken Habit",
-      category: "Habits",
-      description: "Restart a habit you've dropped without the guilt spiral.",
-      prompt: `I want to restart a habit I've dropped. The habit is: [INSERT HABIT]
-I last did it consistently: [TIMEFRAME]
-What stopped me: [REASON]
+4) RECIPE DATABASE — a table: Meal name; Breakfast/Lunch/Dinner tick boxes (colour-tinted); Cook date (date picker); Last had (weeks since last cooked, colour-coded, from the Mark-cooked history); Category; Notes. Clicking a row expands its ingredients + method. Filters for Category and for Last had (Never / This week / 1–3 weeks / 4+ weeks / Due). An "Add recipe" form with: name, category (Asian/Western/High-protein/Other), prep+cook minutes, servings, cooking method (steam/raw/bake/pan/deep-fry/soup), notes, ingredients (one per line with rough quantities), steps — and auto-estimated per-serving calories & protein from the ingredients + method (editable). (Meal slots and cook date are set in the table, not this form.)
 
-Don't tell me to just be more disciplined. Instead:
-1. Help me understand the real reason it stopped (go deeper than the surface reason I gave)
-2. Design a smaller, stupider version of this habit I could start tomorrow
-3. Give me a specific trigger to attach it to
-4. Tell me what the first 7 days should look like, realistically
-5. Help me define what "back on track" looks like so I know when I've succeeded`
-    },
-    {
-      title: "Process a Setback",
-      category: "Reflection",
-      description: "Turn a failure or disappointment into signal instead of noise.",
-      prompt: `Something didn't go the way I wanted and I need help processing it. Here's what happened: [DESCRIBE SETBACK]
+Also:
+- "Paste a recipe": paste recipe text and split it locally (no AI) into name, ingredients and steps for review. Recognise "Ingredients:" / "Steps:" labels.
+- "Smart week": choose how many breakfasts/lunches/dinners I want; pick the set of my recipes needing the FEWEST distinct ingredients to buy, show the shared ingredients, and apply it across the week's days.
+- "New week": clears the planned cook dates and slot ticks but NOT the cooking history.
 
-Don't rush to silver linings. First:
-1. Let me vent — just ask me how I feel about it
-2. Then help me separate what was in my control vs. what wasn't
-3. Ask me what I would do differently, now that I know the outcome
-4. Help me identify what this experience is teaching me about my patterns or assumptions
-5. Then, and only then, help me find the one useful thing to take forward
+Keep everything in one HTML file, persist to localStorage, start empty.`,
+    exampleUse: "For anyone who ends each day in decision fatigue over what to eat — this builds a system so the question is already answered before hunger hits.",
+    instagramUrl: "https://www.instagram.com/p/DaCmz4eCTHV/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
+  }
+];
 
-I want to feel better because I understand it better, not because you told me it'll be okay.`
-    },
-    {
-      title: "Design a Simple Budget",
-      category: "Finance",
-      description: "Build a budget that reflects your real life, not an ideal one.",
-      prompt: `Help me build a simple budget I'll actually use. I'll tell you my monthly take-home income and my non-negotiable fixed expenses.
+/* ════════════════════════════════
+   CATEGORIES CONFIG
+   ════════════════════════════════ */
+const CATEGORIES = [
+  { cat: "All",        label: "All protocols" },
+  { cat: "Mind",       label: "Mind"          },
+  { cat: "Output",     label: "Output"        },
+  { cat: "InProgress", label: "In Progress"   },
+];
 
-Once I share those:
-1. Calculate what's left
-2. Suggest a simple percentage split for the remaining money (spending, savings, buffer)
-3. Help me pick ONE category to track manually this month — not everything
-4. Give me a 5-minute weekly check-in routine to keep me honest
+const CAT_COLORS = {
+  Mind:    { bg: "var(--mind-pale)",    fg: "var(--mind)"    },
+  Clarity: { bg: "var(--clarity-pale)", fg: "var(--clarity)" },
+  Output:  { bg: "var(--output-pale)",  fg: "var(--output)"  },
+  Systems: { bg: "var(--systems-pale)", fg: "var(--systems)" },
+  Growth:  { bg: "var(--growth-pale)",  fg: "var(--growth)"  },
+  Connect: { bg: "var(--connect-pale)", fg: "var(--connect)" },
+};
 
-Make it boring and sustainable, not perfect.`
-    },
-  ];
+/* ════════════════════════════════
+   APP
+   ════════════════════════════════ */
+let activeCategory = "All";
+let searchQuery    = "";
+let modalIdx       = null;
 
-  // ─────────────────────────────────────────
-  // App logic
-  // ─────────────────────────────────────────
+// Stats
+document.getElementById("total-count").textContent = PROMPTS.length;
+document.getElementById("cat-count").textContent   = CATEGORIES.length - 2;
 
-  const grid = document.getElementById('grid');
-  const countEl = document.getElementById('count');
-  const filterBar = document.querySelector('.filter-bar');
+// ── Build sidebar ──
+const catList = document.getElementById("cat-list");
+CATEGORIES.forEach(c => {
+  if (c.cat === "InProgress") {
+    const btn = document.createElement("button");
+    btn.className = "cat-btn";
+    btn.dataset.cat = "InProgress";
+    btn.innerHTML = `<span>${c.label}</span>`;
+    btn.addEventListener("click", () => setCategory("InProgress"));
+    catList.appendChild(btn);
+    return;
+  }
+  const btn = document.createElement("button");
+  btn.className = "cat-btn" + (c.cat === "All" ? " active" : "");
+  btn.dataset.cat = c.cat;
+  btn.innerHTML = `<span>${c.label}</span><span class="cat-count" id="cc-${c.cat}">0</span>`;
+  btn.addEventListener("click", () => setCategory(c.cat));
+  catList.appendChild(btn);
+});
 
-  // Collect unique categories
-  const categories = ['all', ...new Set(prompts.map(p => p.category))];
+// ── Build cards ──
+const grid = document.getElementById("grid");
+PROMPTS.forEach((p, i) => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.dataset.cat = p.category;
+  card.dataset.idx = i;
+  card.role = "listitem";
+  card.tabIndex = 0;
 
-  // Build filter buttons
-  categories.forEach(cat => {
-    if (cat === 'all') return; // already rendered in HTML
-    const btn = document.createElement('button');
-    btn.className = 'filter-btn';
-    btn.dataset.cat = cat;
-    btn.textContent = cat;
-    filterBar.appendChild(btn);
+  const preview = p.promptText.replace(/\n/g, " ").slice(0, 90) + "…";
+
+  card.innerHTML = `
+    <div class="card-top">
+      <span class="card-cat">${p.category}</span>
+      <span class="card-num">${p.id}</span>
+    </div>
+    <div class="card-title">${p.title}</div>
+    <div class="card-desc">${p.description}</div>
+    <div class="card-preview">${esc(preview)}</div>
+    <div class="card-footer">
+      <div class="card-tags">${p.tags.map(t => `<span class="tag">${t}</span>`).join("")}</div>
+      <button class="btn-copy-card" data-idx="${i}" aria-label="Copy">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        Copy
+      </button>
+    </div>
+  `;
+
+  card.addEventListener("click", e => {
+    if (e.target.closest(".btn-copy-card")) return;
+    openModal(i);
+  });
+  card.addEventListener("keydown", e => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openModal(i); }
   });
 
-  // Build cards
-  prompts.forEach((p, i) => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.dataset.cat = p.category;
+  grid.appendChild(card);
+});
 
-    card.innerHTML = `
-      <div class="card-header">
-        <span class="card-title">${p.title}</span>
-        <span class="card-tag">${p.category}</span>
-      </div>
-      <p class="card-desc">${p.description}</p>
-      <div class="prompt-block" id="prompt-${i}">
-        <span class="prompt-text">${escapeHtml(p.prompt)}</span>
-        <div class="prompt-fade"></div>
-      </div>
-      <div class="card-actions">
-        <button class="btn btn-copy" data-idx="${i}">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          Copy prompt
-        </button>
-        <button class="btn btn-expand" data-idx="${i}">Show more</button>
-      </div>
-    `;
+// ── Render ──
+function render() {
+  const q = searchQuery.toLowerCase();
+  const counts = {};
+  CATEGORIES.forEach(c => counts[c.cat] = 0);
+  let visible = 0;
 
-    grid.appendChild(card);
-  });
+  // Hide/show "In Progress" banner
+  let banner = grid.querySelector(".inprogress-banner");
 
-  updateCount();
-
-  // Filter logic
-  let activeFilter = 'all';
-
-  filterBar.addEventListener('click', e => {
-    const btn = e.target.closest('.filter-btn');
-    if (!btn) return;
-
-    activeFilter = btn.dataset.cat;
-    filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b === btn));
-
-    document.querySelectorAll('.card').forEach(card => {
-      card.classList.toggle('hidden', activeFilter !== 'all' && card.dataset.cat !== activeFilter);
-    });
-
-    updateCount();
-  });
-
-  // Copy logic
-  grid.addEventListener('click', e => {
-    const copyBtn = e.target.closest('.btn-copy');
-    if (copyBtn) {
-      const idx = copyBtn.dataset.idx;
-      navigator.clipboard.writeText(prompts[idx].prompt).then(() => {
-        copyBtn.classList.add('copied');
-        copyBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
-        setTimeout(() => {
-          copyBtn.classList.remove('copied');
-          copyBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy prompt`;
-        }, 2000);
-      });
+  if (activeCategory === "InProgress") {
+    document.querySelectorAll(".card").forEach(card => card.classList.add("hidden"));
+    if (!banner) {
+      banner = document.createElement("div");
+      banner.className = "inprogress-banner";
+      banner.style.cssText = "grid-column:1/-1;border:1.5px dashed var(--rule2);border-radius:var(--radius);padding:40px 32px;text-align:center;";
+      banner.innerHTML = `
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);margin-bottom:12px;">Status: In Progress</p>
+        <h3 style="font-size:17px;font-weight:600;color:var(--ink);margin-bottom:8px;">More protocols coming soon</h3>
+        <p style="font-size:13px;color:var(--ink3);line-height:1.6;max-width:360px;margin:0 auto;">New experiments are being tested before they go live here. Follow along <a href="https://www.instagram.com/suzee_daily/?hl=en" target="_blank" rel="noopener noreferrer" style="color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber);">suzee_daily</a> on Instagram for early access.</p>
+      `;
+      grid.appendChild(banner);
     }
-
-    // Expand logic
-    const expandBtn = e.target.closest('.btn-expand');
-    if (expandBtn) {
-      const idx = expandBtn.dataset.idx;
-      const block = document.getElementById(`prompt-${idx}`);
-      const expanded = block.classList.toggle('expanded');
-      expandBtn.textContent = expanded ? 'Show less' : 'Show more';
-    }
-  });
-
-  function updateCount() {
-    const visible = document.querySelectorAll('.card:not(.hidden)').length;
-    countEl.textContent = `${visible} prompt${visible !== 1 ? 's' : ''}`;
+    document.getElementById("content-title").textContent = "— In Progress";
+    document.getElementById("content-count").textContent = "";
+    return;
+  } else {
+    banner?.remove();
   }
 
-  function escapeHtml(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
+  // Always count all prompts for sidebar (ignore active filter)
+  PROMPTS.forEach(p => {
+    counts["All"] = (counts["All"] || 0) + 1;
+    counts[p.category] = (counts[p.category] || 0) + 1;
+  });
+
+  CATEGORIES.forEach(c => {
+    const el = document.getElementById("cc-" + c.cat);
+    if (el) el.textContent = counts[c.cat] || 0;
+  });
+
+  // Filter cards for display
+  document.querySelectorAll(".card").forEach(card => {
+    const p = PROMPTS[+card.dataset.idx];
+    const matchCat    = activeCategory === "All" || p.category === activeCategory;
+    const matchSearch = !q || [p.title, p.description, p.promptText, ...p.tags]
+                               .some(s => s.toLowerCase().includes(q));
+    const show = matchCat && matchSearch;
+    card.classList.toggle("hidden", !show);
+    if (show) visible++;
+  });
+
+  const dest = CATEGORIES.find(c => c.cat === activeCategory);
+  document.getElementById("content-title").textContent = "— " + (dest?.label || "All protocols");
+  document.getElementById("content-count").textContent = `${visible} of ${PROMPTS.length} protocols`;
+
+  let emptyEl = grid.querySelector(".empty");
+  if (visible === 0) {
+    if (!emptyEl) {
+      emptyEl = document.createElement("div");
+      emptyEl.className = "empty";
+      emptyEl.innerHTML = `
+        <p class="empty-code">Result: 0 protocols found</p>
+        <h3>No matches</h3>
+        <p>Try a different search term or select another category.</p>
+      `;
+      grid.appendChild(emptyEl);
+    }
+  } else { emptyEl?.remove(); }
+}
+
+function setCategory(cat) {
+  activeCategory = cat;
+  document.querySelectorAll(".cat-btn").forEach(b => b.classList.toggle("active", b.dataset.cat === cat));
+  render();
+}
+
+// ── Search ──
+const searchInput = document.getElementById("search");
+const searchClear = document.getElementById("search-clear");
+
+searchInput.addEventListener("input", () => {
+  searchQuery = searchInput.value;
+  searchClear.classList.toggle("show", !!searchQuery);
+  render();
+});
+
+searchClear.addEventListener("click", () => {
+  searchInput.value = ""; searchQuery = "";
+  searchClear.classList.remove("show");
+  searchInput.focus(); render();
+});
+
+// ── Copy card ──
+document.addEventListener("click", e => {
+  const btn = e.target.closest(".btn-copy-card");
+  if (!btn) return;
+  e.stopPropagation();
+  doCopy(PROMPTS[+btn.dataset.idx].promptText, btn, `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`, "Copied");
+});
+
+// ── Modal ──
+const overlay  = document.getElementById("overlay");
+const mCat     = document.getElementById("m-cat");
+const mId      = document.getElementById("m-id");
+const mTitle   = document.getElementById("m-title");
+const mDesc    = document.getElementById("m-desc");
+const mPrompt  = document.getElementById("m-prompt");
+const mExample   = document.getElementById("m-example");
+const mExText    = document.getElementById("m-example-text");
+const mCopy      = document.getElementById("m-copy");
+const mInstagram = document.getElementById("m-instagram");
+
+function openModal(idx) {
+  const p = PROMPTS[idx];
+  modalIdx = idx;
+  const col = CAT_COLORS[p.category] || { bg: "var(--paper2)", fg: "var(--ink2)" };
+  mCat.textContent = p.category;
+  mCat.style.background = col.bg;
+  mCat.style.color = col.fg;
+  mId.textContent = p.id;
+  mTitle.textContent = p.title;
+  mDesc.textContent  = p.description;
+  mPrompt.textContent = p.promptText;
+  if (p.exampleUse) { mExText.textContent = p.exampleUse; mExample.style.display = "block"; }
+  else { mExample.style.display = "none"; }
+  if (p.instagramUrl) { mInstagram.href = p.instagramUrl; mInstagram.style.display = "block"; }
+  else { mInstagram.style.display = "none"; }
+  mCopy.textContent = "Copy Protocol";
+  mCopy.classList.remove("copied");
+  overlay.classList.add("open");
+  document.body.style.overflow = "hidden";
+  document.getElementById("btn-close").focus();
+}
+
+function closeModal() {
+  overlay.classList.remove("open");
+  document.body.style.overflow = "";
+  modalIdx = null;
+}
+
+document.getElementById("btn-close").addEventListener("click", closeModal);
+overlay.addEventListener("click", e => { if (e.target === overlay) closeModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+mCopy.addEventListener("click", () => {
+  if (modalIdx === null) return;
+  doCopy(PROMPTS[modalIdx].promptText, mCopy, "Copy Protocol", "Copied!");
+});
+
+// ── Utils ──
+function doCopy(text, btn, def, ok) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.innerHTML = ok; btn.classList.add("copied");
+    setTimeout(() => { btn.innerHTML = def; btn.classList.remove("copied"); }, 2000);
+  });
+}
+
+function esc(s) {
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+render();
 </script>
 </body>
 </html>
