@@ -795,6 +795,32 @@ Also:
 Keep everything in one HTML file, persist to localStorage, start empty.`,
     exampleUse: "For anyone who ends each day in decision fatigue over what to eat — this builds a system so the question is already answered before hunger hits.",
     instagramUrl: "https://www.instagram.com/p/DaCmz4eCTHV/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
+  },
+  {
+    id: "EXP-003",
+    title: "Recurring Payment Audit",
+    category: "Output",
+    tags: ["finance", "subscriptions", "budgeting", "spending"],
+    description: "Paste your transaction history and get a full audit of recurring charges — flagging new, missing, unrecognized, and price-hiked subscriptions before you pay for something you didn't intend.",
+    promptText: `I want to find recurring or repeated payments in my transaction data and make sure they're all subscriptions or charges I actually intended.
+
+1. Group transactions by vendor name and amount. For any vendor + amount combination that appears in 2 or more separate months, list it: vendor, amount, how many months it appeared, and which months.
+
+2. Flag anything unusual:
+- A recurring charge that appeared for the first time in the last month or two (new subscription I may not remember signing up for)
+- A recurring charge that was present in earlier months but is missing from the most recent month (could mean it was cancelled, or the billing date shifted)
+- A vendor name I don't recognize or that's written in a way I can't decode (codes, abbreviations, payment processor names instead of the actual merchant)
+- Any installment or buy-now-pay-later style plan — tell me how many payments remain and the total still owed
+- A charge that increased in amount compared to earlier months under the same vendor (possible price hike)
+
+3. Group the results into three buckets: charges I clearly recognize and intend to keep, fixed/essential costs (rent, insurance, utilities, etc.), and unclear charges that need my input.
+
+4. For anything in the unclear bucket, ask me what it is rather than guessing, so I can confirm or flag it as something to cancel.
+
+Here is my transaction data (exported as a Markdown .md file):
+[PASTE YOUR .MD FILE CONTENTS HERE]`,
+    exampleUse: "Export your bank or credit card transactions as a Markdown (.md) file, paste the contents in, and run this at the end of each month to catch subscriptions you forgot about or charges that quietly increased.",
+    instagramUrl: "https://www.instagram.com/p/DaILMhUCT3R/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
   }
 ];
 
