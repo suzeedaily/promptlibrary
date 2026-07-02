@@ -837,6 +837,78 @@ I'll know I've succeeded when I can build the core tool myself and apply it to a
 Finally, tell me the best way to read and retain it.`,
     exampleUse: "Upload any course syllabus, textbook table of contents, or curriculum PDF and drop it in place of [file]. Works for any subject — finance, coding, nutrition, investing, or anything you want to actually understand, not just skim.",
     instagramUrl: "https://www.instagram.com/p/DaKgDlcieEa/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=="
+  },
+  {
+    id: "EXP-005",
+    title: "Apple Health Dashboard Builder",
+    category: "Output",
+    tags: ["health", "apple health", "dashboard", "data", "fitness"],
+    description: "Turn your Apple Health export into a fully interactive offline dashboard — weight, body fat, steps, energy balance, trends, and AI insights. No coding needed, just 3 prompts.",
+    promptText: `Build Your Own Apple Health Dashboard — Fast Track
+
+Build a single-file, interactive health dashboard (weight, body-fat %, body composition, activity) from your own Apple Health export, using an AI coding assistant. No coding needed — export your data, then paste the prompts below. This is the optimized path: 3 main prompts instead of a dozen.
+
+─────────────────────────────
+WHAT YOU'LL END UP WITH
+─────────────────────────────
+One health-dashboard.html you open in any browser (offline, no server), with:
+- Overview tab — stats, goals & projection, energy balance, plain-English insights
+- Trends tab — interactive charts (weight, body fat, lean vs fat mass, steps, calories)
+- Daily/weekly toggle, time-range filters, goal-aware coloring, Settings and Help panels
+
+─────────────────────────────
+PREREQUISITES
+─────────────────────────────
+- iPhone with the Health app (ideally a smart scale that logs body-fat %)
+- A file-aware AI coding assistant (e.g. Claude Code) opened in a working folder
+
+─────────────────────────────
+STEP 1 — Export your Apple Health data
+─────────────────────────────
+Health app → tap your profile photo → Export All Health Data → share the .zip to yourself → drop it in your working folder. Inside is apple_health_export/export.xml.
+
+Keep the raw export private — it contains all your health data.
+
+─────────────────────────────
+STEP 2 — PROMPT 1: Extract the data
+─────────────────────────────
+"I have an Apple Health export zip <your-file>.zip in this folder. Unzip it and parse export.xml. Extract body weight, body-fat %, steps, distance, active energy, and basal energy, grouped by day (one value per day; sum steps/distance/calories, take the last weight/fat reading). Convert body-fat to a percentage. Save the result to health-data.json and tell me the record counts and date range. Flag any metric that doesn't have consistent recent data so we can skip it."
+
+─────────────────────────────
+STEP 3 — PROMPT 2: The master build
+─────────────────────────────
+"Using health-data.json, build a single self-contained health-dashboard.html — all HTML/CSS/JS inline, Chart.js from a CDN, dark modern theme, works offline with the data inlined. Requirements:
+
+Layout — two tabs:
+- Overview: a row of equal-sized stat cards (3 per row), then Goals & Projection + Energy Balance panels, then an Insights card.
+- Trends: charts — Weight & Body Fat over time (dual axis), Weight, Body Fat, and (collapsed by default, expand on click) Body Composition, Steps & Distance, Calories.
+
+Global header controls: time-range buttons (3M/6M/1Y/2Y/All) and a Daily / Weekly-average toggle that affect everything. A Settings popover holds Goal (Cut/Maintain/Bulk), Profile (Male/Female), and target Weight / Body-fat inputs (saved to localStorage). A Help popover explains the formulas and thresholds.
+
+Analytics:
+- Lean mass = weight×(1−fat%); Fat mass = weight×fat%. Chart both.
+- Weight velocity: linear-regression slope over the last 28 days → kg/week and %/week, with a goal-aware verdict. Cut targets −0.35 to −1.0 %/wk = On track; 0 to −0.35 = Slow; ±0.1 = Plateau; faster than −1.0 = Aggressive. Bulk is the mirror (+0.15 to +0.5 %/wk).
+- Recomp quality: of recent change, % that is fat vs lean (on a cut, mostly-fat = good).
+- Energy balance: TDEE = avg(active+basal) over 28 days; implied daily deficit/surplus = weekly weight change ÷ 7 × 7,700 kcal; show estimated intake. Label it an estimate.
+- Goals: target reference lines, progress bars, and a projected ETA at current rate.
+- Sex-calibrated body-fat zones (men: Athletic <14 / Fitness 14–17 / Acceptable 18–24 / High 25+; women: <21 / 21–24 / 25–31 / 32+).
+- Goal-aware coloring: on a cut, down = green; on a bulk, up = green; fat down = green.
+- ±1 SD confidence band behind the weight trend, and auto-detected cut/bulk phase shading on the main chart.
+- A prescriptive Insights panel: explain what's happening and what to change.
+
+Keep everything in one file. After building, verify the computed numbers against the real data so units are right (e.g. distance in km, fat stored as a fraction vs percent)."
+
+─────────────────────────────
+STEP 4 — PROMPT 3: Verify & refine
+─────────────────────────────
+"Open it and sanity-check: confirm the velocity, energy balance, and projection numbers are plausible for my data; make the Overview spacious with equal-height cards; ensure the tabs, collapsible charts, Settings, and Help all work. Fix anything off, then show me a summary of what each metric means."
+
+─────────────────────────────
+STEP 5 — Use it & keep it updated
+─────────────────────────────
+Double-click health-dashboard.html — it runs offline.
+New data later? Re-export from Apple Health and say: "update the dashboard with my latest export."`,
+    exampleUse: "Export your Apple Health data as a .zip, drop it in your Claude Code working folder, then run the 3 prompts in order. You'll have a personal health dashboard in about 15 minutes with zero coding."
   }
 ];
 
